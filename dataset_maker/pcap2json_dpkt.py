@@ -40,15 +40,15 @@ def walkFile(file):
 
 def fast_pkt_info(buf,ts):
     eth = dpkt.ethernet.Ethernet(buf)  # 解包，物理层
- 
+
     if not isinstance(eth.data, dpkt.ip.IP):  # 解包，网络层，判断网络层是否存在
         return []
- 
+
     ip = eth.data
- 
+
     src = socket.inet_ntoa(ip.src)  # 源地址
     dst = socket.inet_ntoa(ip.dst)  # 目的地址
- 
+
     transf_type = 0
     if isinstance(ip.data, dpkt.udp.UDP):  # 解包，判断传输层协议是否是UDP
         transf_type = 17
@@ -124,7 +124,6 @@ def fast_read_pcap(input_file,label,split_second = 5000):
                 #后处理
                 start_time = ts
                 flows = {}
-                  
     list_values = [i for i in flows.values()]
     return_list.append([list_values,label])
     

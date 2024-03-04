@@ -26,7 +26,7 @@ def read_dataset(cfg):
     cfg.CLASS_NUM = len(label2key)
     cfg.PACKTE_DIM = len(dataset[0][0][0][0]) + 3
     print("cfg.PACKTE_DIM",cfg.PACKTE_DIM)
-   
+
     print('start dataset2flow()...')
     if cfg.HU2_FLAG:
         dataset = dataset2flow(dataset)

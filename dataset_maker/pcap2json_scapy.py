@@ -9,6 +9,7 @@ import os
 from scapy.all import *
 import time
 import json
+import tqdm
 
 #import dpkt
 import socket
@@ -65,9 +66,6 @@ def fast_pkt_info(i_pkt):
         
     except:
         return []
-        
-
-    
 
 
 def fast_read_pcap(input_file,label,split_second = 5000):
@@ -82,62 +80,71 @@ def fast_read_pcap(input_file,label,split_second = 5000):
 
         for pkt in pcap_reader:  # 遍历pcap数据
             pkt_id += 1
-            if pkt_id%10000 == 0:
-                print(pkt_id)
+            if pkt_id > 10000:
+                break
+            # 不添加split_second分割
+            pktinfo1 = fast_pkt_info(pkt)
+            if len(pktinfo1) > 0:
+                unit = pktinfo1[0]
+                data = pktinfo1[1]
+                if unit not in flows.keys():
+                    flows[unit] = []
+                flows[unit].append(data)
+        list_values = [i for i in flows.values()]
+        return_list.append([list_values,label])
+            # if pkt_id%10000 == 0:
+            #     print(pkt_id)
 
-            if first_start_flag == True:
-                first_start_flag = False
-                start_time = pkt.time
-                pktinfo1 = fast_pkt_info(pkt)
-                if len(pktinfo1) >0 :
-                    unit = pktinfo1[0]
-                    data = pktinfo1[1]
-                    if unit not in flows.keys():
-                        flows[unit] = []
-                    flows[unit].append(data)
-                continue
+            # if first_start_flag == True:
+            #     first_start_flag = False
+            #     start_time = pkt.time
+            #     pktinfo1 = fast_pkt_info(pkt)
+            #     if len(pktinfo1) >0 :
+            #         unit = pktinfo1[0]
+            #         data = pktinfo1[1]
+            #         if unit not in flows.keys():
+            #             flows[unit] = []
+            #         flows[unit].append(data)
+            #     continue
             
-            if pkt.time - start_time <= split_second:
-                pktinfo1 = fast_pkt_info(pkt)
-                if len(pktinfo1) >0 :
-                    unit = pktinfo1[0]
-                    data = pktinfo1[1]
-                    if unit not in flows.keys():
-                        flows[unit] = []
-                    flows[unit].append(data)
-            else:
-                # 进行分流，处理特征
-                list_values = [i for i in flows.values()]
-                return_list.append([list_values,label])
+            # if pkt.time - start_time <= split_second:
+            #     pktinfo1 = fast_pkt_info(pkt)
+            #     if len(pktinfo1) >0 :
+            #         unit = pktinfo1[0]
+            #         data = pktinfo1[1]
+            #         if unit not in flows.keys():
+            #             flows[unit] = []
+            #         flows[unit].append(data)
+            # else:
+            #     # 进行分流，处理特征
+            #     list_values = [i for i in flows.values()]
+            #     return_list.append([list_values,label])
                 
-                #后处理
-                start_time = start_time + split_second
-                flows = {}
-                  
-                
+            #     #后处理
+            #     start_time = start_time + split_second
+            #     flows = {}
 
     return return_list
 
 
 
 def main():
-    walkFile("./pcaps/")
-    print(file_path_dcit)
+    walkFile("/Volumes/LCG_2/Datasets/ISCX-VPN/application/Arbitrary/channel/sliced/")
+    # print(file_path_dcit)
     label = 0
-    for key in file_path_dcit.keys():
+    for key in tqdm.tqdm(file_path_dcit.keys()):
         sample_num =0 
-        for pcapfile in file_path_dcit[key]:
+        for pcapfile in tqdm.tqdm(file_path_dcit[key]):
             if not (pcapfile.endswith('.pcap') or pcapfile.endswith('.pcapng') ):
                 continue
-            print(pcapfile)
+            # print(pcapfile)
             return_list = fast_read_pcap(pcapfile,label)
-            print(len(return_list))
+            # print(len(return_list))
             sample_num += len(return_list)
             final_labeled_list.extend(return_list)
         
         print(key,'sample_num',sample_num)
-        
-            
+
         label += 1
         label2key.append(key)
             
@@ -145,12 +152,9 @@ def main():
     print('Now save file...')
     # 保存到json文件
     content = [final_labeled_list,label2key]
-    filename = "pcap.json"
+    filename = "/Volumes/LCG_3/Datasets/ISCX-VPN/application/Sec23/dataset/pcap.json"
     with open(filename, 'w') as file_obj:
         json.dump(content, file_obj)
-    
-    
 
 if __name__ == '__main__':
     main()
-    

@@ -6,8 +6,8 @@ DATASET_SHARE = False # is not ready...
 PACTETCNN = True
 TRANSFORMER = False
 
-PACKET2FLOW = 'LSTM+ATT' # 'ATT, LSTM, TREE, LSTM+ATT,1dCNN, 2dCNN' 1dCNN can be used only if one flow has a fixed length of packet vectors. if 1dCNN/2dCNN, PACTETCNN should = False.   
-                      # 2dCNN uses hilbertcurve2d to transfer a flow into a matrix.
+PACKET2FLOW = 'LSTM+ATT'    # 'ATT, LSTM, TREE, LSTM+ATT,1dCNN, 2dCNN' 1dCNN can be used only if one flow has a fixed length of packet vectors. if 1dCNN/2dCNN, PACTETCNN should = False.
+                            # 2dCNN uses hilbertcurve2d to transfer a flow into a matrix.
 FLOW2TRACE = 'LSTM+ATT' # 'ATT, LSTM, TREE, LSTM+ATT'
 
 # k-fold
